@@ -1,0 +1,18 @@
+# Netlify build configuration for the HVA Report app.
+# With this file committed, Netlify reads these settings automatically —
+# no need to type the build command or publish directory in the dashboard.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Pin the Node version Netlify builds with. Bump if you need newer.
+  NODE_VERSION = "20"
+
+# Single-page app fallback: any unknown path serves index.html so the
+# React app handles routing instead of Netlify returning a 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
