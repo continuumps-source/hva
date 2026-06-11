@@ -281,18 +281,162 @@ function RankList({ rows, metric }) {
   );
 }
 
+// ---- Add Hazard form (modal) --------------------------------------
+function AddHazardForm({ onSave, onCancel }) {
+  const [f, setF] = useState({
+    name: "", category: "Natural", probability: 50, impact: 50,
+    threats: 0, mitigations: 0, definition: "", context: "", description: "",
+  });
+  const [err, setErr] = useState("");
+  const set = (k, v) => setF((s) => ({ ...s, [k]: v }));
+
+  function submit() {
+    if (!f.name.trim()) { setErr("Name is required."); return; }
+    const num = (v) => Math.max(0, Math.min(100, Number(v) || 0));
+    const probability = num(f.probability);
+    const impact = num(f.impact);
+    const record = {
+      name: f.name.trim(),
+      category: f.category,
+      definition: f.definition.trim() || `A ${f.category.toLowerCase()} hazard.`,
+      context: f.context.trim() || "Added via the report.",
+      probability,
+      impact,
+      threats: Math.max(0, Number(f.threats) || 0),
+      mitigations: Math.max(0, Number(f.mitigations) || 0),
+      targetRisk: Math.max(10, Math.round(probability * 0.45 + impact * 0.55) - 15),
+      capabilities: CAPABILITIES.map((name) => ({ name, score: 10 })),
+      description: f.description.trim() || `${f.name.trim()} represents a risk to organizational continuity.`,
+      mitigationList: [],
+      threatList: [],
+      references: [],
+    };
+    onSave(record);
+  }
+
+  const label = { fontSize: 12, fontWeight: 600, color: T.sub, display: "block", marginBottom: 4 };
+  const input = {
+    width: "100%", padding: "8px 10px", border: `1px solid ${T.line}`, borderRadius: 6,
+    fontSize: 13, boxSizing: "border-box", fontFamily: "inherit",
+  };
+
+  return (
+    <div
+      onClick={onCancel}
+      style={{
+        position: "fixed", inset: 0, background: "rgba(15,30,40,0.45)",
+        display: "flex", alignItems: "flex-start", justifyContent: "center",
+        padding: 24, zIndex: 1000, overflowY: "auto",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fff", borderRadius: 12, padding: 24, width: "100%",
+          maxWidth: 540, boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+        }}
+      >
+        <h2 style={{ margin: "0 0 16px", fontSize: 18, color: T.teal }}>Add Hazard</h2>
+
+        <div style={{ marginBottom: 12 }}>
+          <label style={label}>Hazard name *</label>
+          <input style={input} value={f.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Flash Flooding" />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+          <div>
+            <label style={label}>Category</label>
+            <select style={input} value={f.category} onChange={(e) => set("category", e.target.value)}>
+              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+          <div>
+            <label style={label}>Probability (0–100)</label>
+            <input style={input} type="number" min="0" max="100" value={f.probability} onChange={(e) => set("probability", e.target.value)} />
+          </div>
+          <div>
+            <label style={label}>Impact (0–100)</label>
+            <input style={input} type="number" min="0" max="100" value={f.impact} onChange={(e) => set("impact", e.target.value)} />
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+          <div>
+            <label style={label}>Threats (count)</label>
+            <input style={input} type="number" min="0" value={f.threats} onChange={(e) => set("threats", e.target.value)} />
+          </div>
+          <div>
+            <label style={label}>Mitigations (count)</label>
+            <input style={input} type="number" min="0" value={f.mitigations} onChange={(e) => set("mitigations", e.target.value)} />
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <label style={label}>Definition</label>
+          <input style={input} value={f.definition} onChange={(e) => set("definition", e.target.value)} placeholder="What this hazard is" />
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <label style={label}>Context</label>
+          <input style={input} value={f.context} onChange={(e) => set("context", e.target.value)} placeholder="Scenario / local context" />
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <label style={label}>Description</label>
+          <textarea style={{ ...input, minHeight: 60, resize: "vertical" }} value={f.description} onChange={(e) => set("description", e.target.value)} />
+        </div>
+
+        {err && <p style={{ color: "#c0392b", fontSize: 13, margin: "0 0 12px" }}>{err}</p>}
+
+        <p style={{ fontSize: 11, color: T.sub, margin: "0 0 16px" }}>
+          Saved in this browser. Use “Export hazards.json” to make it permanent and shared.
+        </p>
+
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <button
+            onClick={onCancel}
+            style={{ padding: "8px 16px", border: `1px solid ${T.line}`, borderRadius: 6, background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
+          >Cancel</button>
+          <button
+            onClick={submit}
+            style={{ padding: "8px 16px", border: "none", borderRadius: 6, background: T.teal, color: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
+          >Add Hazard</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- localStorage helpers (browser-only additions) ----------------
+const LS_KEY = "hva_added_hazards_v1";
+function loadAdded() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function saveAdded(list) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch { /* ignore */ }
+}
+
 // ---- Main component ------------------------------------------------
 export default function HVAReport() {
-  const [data, setData] = useState(null);     // derived hazards once loaded
+  const [rawHazards, setRawHazards] = useState(null); // source records (file + added)
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("summary"); // summary | category | selected | details
   const [activeCategory, setActiveCategory] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [exporting, setExporting] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
   const reportRef = useRef(null);
 
-  // Load hazard data from the JSON file. Swap the URL for a real API
-  // endpoint later — the shape and everything downstream stays the same.
+  // Load hazard data from the JSON file, then merge any hazards this
+  // browser has added locally (localStorage). Swap the fetch for a real
+  // API later — the shape and everything downstream stays the same.
   useEffect(() => {
     let cancelled = false;
     fetch(`${import.meta.env.BASE_URL}hazards.json`)
@@ -302,15 +446,58 @@ export default function HVAReport() {
       })
       .then((json) => {
         if (cancelled) return;
-        const derived = (json.hazards || []).map(deriveHazard);
-        setData(derived);
-        setSelectedId(derived[0]?.id ?? null);
+        const fromFile = json.hazards || [];
+        const added = loadAdded();
+        const merged = [...fromFile, ...added];
+        setRawHazards(merged);
+        setSelectedId(merged[0]?.id ?? null);
       })
       .catch((e) => { if (!cancelled) setLoadError(e.message); });
     return () => { cancelled = true; };
   }, []);
 
-  const rows = useMemo(() => {
+  // Derived hazards (risk scores + bands) recomputed whenever raw changes.
+  const data = useMemo(
+    () => (rawHazards ? rawHazards.map(deriveHazard) : null),
+    [rawHazards]
+  );
+
+  // Add a new hazard: append to raw list and persist the *added* subset.
+  function addHazard(record) {
+    setRawHazards((prev) => {
+      const base = prev || [];
+      const nextId = base.reduce((m, h) => Math.max(m, h.id), -1) + 1;
+      const full = { ...record, id: nextId };
+      const next = [...base, full];
+      // Persist only the locally-added ones (everything not from the file
+      // is re-derivable, but we track additions by keeping them in LS).
+      const added = loadAdded();
+      saveAdded([...added, full]);
+      return next;
+    });
+    setShowAdd(false);
+  }
+
+  // Export the full current dataset as a clean hazards.json (no derived
+  // fields). Commit this file to the repo to share additions with everyone.
+  function exportData() {
+    const clean = (rawHazards || []).map((h) => {
+      const { risk, riskBand, probBand, impactBand, ...rest } = h;
+      return rest;
+    });
+    const blob = new Blob([JSON.stringify({ hazards: clean }, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "hazards.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function clearAdded() {
+    if (!confirm("Remove hazards added in this browser? Hazards from the published file stay.")) return;
+    saveAdded([]);
+    window.location.reload();
+  }
     if (!data) return [];
     if (view === "category" && activeCategory) {
       return data.filter((r) => r.category === activeCategory);
@@ -430,6 +617,28 @@ export default function HVAReport() {
             );
           })}
           <button
+            onClick={() => setShowAdd(true)}
+            style={{
+              border: "none", borderRadius: 6, padding: "6px 12px",
+              fontSize: 12, cursor: "pointer", fontWeight: 600, background: "#27ae60", color: "#fff",
+            }}
+          >+ Add Hazard</button>
+          <button
+            onClick={exportData}
+            style={{
+              border: `1px solid ${T.teal}`, borderRadius: 6, padding: "6px 12px",
+              fontSize: 12, cursor: "pointer", fontWeight: 600, background: "#fff", color: T.teal,
+            }}
+          >Export hazards.json</button>
+          <button
+            onClick={clearAdded}
+            title="Remove hazards you added in this browser"
+            style={{
+              border: `1px solid ${T.line}`, borderRadius: 6, padding: "6px 12px",
+              fontSize: 12, cursor: "pointer", fontWeight: 600, background: "#fff", color: T.sub,
+            }}
+          >Clear my additions</button>
+          <button
             onClick={exportPdf}
             disabled={exporting}
             style={{
@@ -439,6 +648,8 @@ export default function HVAReport() {
           >{exporting ? "Exporting…" : "Export PDF"}</button>
         </div>
       </div>
+
+      {showAdd && <AddHazardForm onSave={addHazard} onCancel={() => setShowAdd(false)} />}
 
       <div ref={reportRef} style={{ display: "grid", gridTemplateColumns: "150px 1fr", gap: 12 }}>
         {/* Left stat rail */}

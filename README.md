@@ -76,6 +76,24 @@ place to drop in the client's real scoring formula.
 
 `category` must be one of: Natural, Accidental, Intentional.
 
+### Adding hazards
+
+The report has an **+ Add Hazard** button. Added hazards:
+
+- appear immediately and update all charts, lists, and totals;
+- are saved in **your browser** (localStorage), so they survive reloads
+  on that machine — but they are *not* visible to other people yet.
+
+To make additions permanent and shared with everyone:
+
+1. Click **Export hazards.json** — it downloads the full current dataset.
+2. Replace `public/hazards.json` in the project with that file.
+3. Commit and push (or re-deploy). Now the additions ship with the site
+   and everyone sees them.
+
+**Clear my additions** removes the hazards you added in this browser
+(the published ones from the file stay).
+
 ### Regenerating the sample data
 
 `gen-data.mjs` produced the current sample file. Run `node gen-data.mjs`
