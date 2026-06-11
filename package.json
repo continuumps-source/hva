@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:prep": "npm install && vite build && echo \"\\n=== DONE. Now drag the 'dist' folder onto Netlify. ===\\n\""
   },
   "dependencies": {
     "chart.js": "^4.4.1",

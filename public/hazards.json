@@ -4,10 +4,13 @@
       "id": 0,
       "name": "Hurricane",
       "category": "Natural",
+      "definition": "A natural hazard is an event or process in the natural environment that may cause loss of life, injury, or property damage.",
+      "context": "Hurricane scenario as recorded during the organizational set-up survey.",
       "probability": 75,
       "impact": 37,
       "threats": 34,
       "mitigations": 319,
+      "targetRisk": 24,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -43,22 +46,30 @@
         {
           "id": 0,
           "title": "Hurricane mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Hurricane mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Hurricane mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Hurricane mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -77,16 +88,23 @@
           "title": "Hurricane threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Hurricane",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 1,
       "name": "Severe Thunderstorm",
       "category": "Natural",
+      "definition": "A natural hazard is an event or process in the natural environment that may cause loss of life, injury, or property damage.",
+      "context": "Severe Thunderstorm scenario as recorded during the organizational set-up survey.",
       "probability": 96,
       "impact": 48,
       "threats": 30,
       "mitigations": 148,
+      "targetRisk": 39,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -122,22 +140,30 @@
         {
           "id": 0,
           "title": "Severe Thunderstorm mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Severe Thunderstorm mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Severe Thunderstorm mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Severe Thunderstorm mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -156,16 +182,23 @@
           "title": "Severe Thunderstorm threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Severe Thunderstorm",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 2,
       "name": "Tornado",
       "category": "Natural",
+      "definition": "A natural hazard is an event or process in the natural environment that may cause loss of life, injury, or property damage.",
+      "context": "Tornado scenario as recorded during the organizational set-up survey.",
       "probability": 36,
       "impact": 76,
       "threats": 49,
       "mitigations": 77,
+      "targetRisk": 38,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -201,22 +234,30 @@
         {
           "id": 0,
           "title": "Tornado mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Tornado mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Tornado mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Tornado mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -235,16 +276,23 @@
           "title": "Tornado threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Tornado",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 3,
       "name": "Coastal Flooding",
       "category": "Natural",
+      "definition": "A natural hazard is an event or process in the natural environment that may cause loss of life, injury, or property damage.",
+      "context": "Coastal Flooding scenario as recorded during the organizational set-up survey.",
       "probability": 96,
       "impact": 35,
       "threats": 14,
       "mitigations": 417,
+      "targetRisk": 47,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -280,22 +328,30 @@
         {
           "id": 0,
           "title": "Coastal Flooding mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Coastal Flooding mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Coastal Flooding mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Coastal Flooding mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -314,16 +370,23 @@
           "title": "Coastal Flooding threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Coastal Flooding",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 4,
       "name": "Wildfire",
       "category": "Natural",
+      "definition": "A natural hazard is an event or process in the natural environment that may cause loss of life, injury, or property damage.",
+      "context": "Wildfire scenario as recorded during the organizational set-up survey.",
       "probability": 79,
       "impact": 90,
       "threats": 30,
       "mitigations": 103,
+      "targetRisk": 69,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -359,22 +422,30 @@
         {
           "id": 0,
           "title": "Wildfire mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Wildfire mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Wildfire mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Wildfire mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -393,16 +464,23 @@
           "title": "Wildfire threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Wildfire",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 5,
-      "name": "Hazmat Spill",
-      "category": "Accidental",
+      "name": "Earthquake",
+      "category": "Natural",
+      "definition": "A natural hazard is an event or process in the natural environment that may cause loss of life, injury, or property damage.",
+      "context": "Earthquake scenario as recorded during the organizational set-up survey.",
       "probability": 86,
       "impact": 96,
       "threats": 36,
       "mitigations": 122,
+      "targetRisk": 59,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -433,27 +511,129 @@
           "score": 8
         }
       ],
+      "description": "Earthquake represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
+      "mitigationList": [
+        {
+          "id": 0,
+          "title": "Earthquake mitigation 1",
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
+        },
+        {
+          "id": 1,
+          "title": "Earthquake mitigation 2",
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
+        },
+        {
+          "id": 2,
+          "title": "Earthquake mitigation 3",
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
+        },
+        {
+          "id": 3,
+          "title": "Earthquake mitigation 4",
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
+        }
+      ],
+      "threatList": [
+        {
+          "id": 0,
+          "title": "Earthquake threat vector 1",
+          "severity": "High"
+        },
+        {
+          "id": 1,
+          "title": "Earthquake threat vector 2",
+          "severity": "Medium"
+        },
+        {
+          "id": 2,
+          "title": "Earthquake threat vector 3",
+          "severity": "Low"
+        }
+      ],
+      "references": [
+        "FEMA hazard profile — Earthquake",
+        "Organizational set-up survey (2023)"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Hazmat Spill",
+      "category": "Accidental",
+      "definition": "An accidental hazard originates from technological or industrial accidents, infrastructure failures, or human activities causing harm or disruption.",
+      "context": "Hazmat Spill scenario as recorded during the organizational set-up survey.",
+      "probability": 88,
+      "impact": 32,
+      "threats": 47,
+      "mitigations": 317,
+      "targetRisk": 27,
+      "capabilities": [
+        {
+          "name": "Security & Protective Services",
+          "score": 8
+        },
+        {
+          "name": "Healthcare Services",
+          "score": 19
+        },
+        {
+          "name": "Human Resource Management",
+          "score": 17
+        },
+        {
+          "name": "Logistics & Supply Chain",
+          "score": 13
+        },
+        {
+          "name": "Environmental Health & Safety",
+          "score": 14
+        },
+        {
+          "name": "Communication & Information",
+          "score": 11
+        },
+        {
+          "name": "Infrastructure Systems",
+          "score": 12
+        }
+      ],
       "description": "Hazmat Spill represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
       "mitigationList": [
         {
           "id": 0,
           "title": "Hazmat Spill mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Hazmat Spill mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Hazmat Spill mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Hazmat Spill mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -472,28 +652,35 @@
           "title": "Hazmat Spill threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Hazmat Spill",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
-      "id": 6,
+      "id": 7,
       "name": "Structure Fire",
       "category": "Accidental",
-      "probability": 88,
-      "impact": 32,
-      "threats": 47,
-      "mitigations": 317,
+      "definition": "An accidental hazard originates from technological or industrial accidents, infrastructure failures, or human activities causing harm or disruption.",
+      "context": "Structure Fire scenario as recorded during the organizational set-up survey.",
+      "probability": 65,
+      "impact": 39,
+      "threats": 4,
+      "mitigations": 349,
+      "targetRisk": 27,
       "capabilities": [
         {
           "name": "Security & Protective Services",
-          "score": 8
+          "score": 11
         },
         {
           "name": "Healthcare Services",
-          "score": 19
+          "score": 11
         },
         {
           "name": "Human Resource Management",
-          "score": 17
+          "score": 9
         },
         {
           "name": "Logistics & Supply Chain",
@@ -505,11 +692,11 @@
         },
         {
           "name": "Communication & Information",
-          "score": 11
+          "score": 16
         },
         {
           "name": "Infrastructure Systems",
-          "score": 12
+          "score": 17
         }
       ],
       "description": "Structure Fire represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
@@ -517,22 +704,30 @@
         {
           "id": 0,
           "title": "Structure Fire mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Structure Fire mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Structure Fire mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Structure Fire mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -551,44 +746,51 @@
           "title": "Structure Fire threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Structure Fire",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
-      "id": 7,
+      "id": 8,
       "name": "Power Outage",
       "category": "Accidental",
-      "probability": 65,
-      "impact": 39,
-      "threats": 4,
-      "mitigations": 349,
+      "definition": "An accidental hazard originates from technological or industrial accidents, infrastructure failures, or human activities causing harm or disruption.",
+      "context": "Power Outage scenario as recorded during the organizational set-up survey.",
+      "probability": 34,
+      "impact": 83,
+      "threats": 41,
+      "mitigations": 478,
+      "targetRisk": 37,
       "capabilities": [
         {
           "name": "Security & Protective Services",
-          "score": 11
-        },
-        {
-          "name": "Healthcare Services",
-          "score": 11
-        },
-        {
-          "name": "Human Resource Management",
-          "score": 9
-        },
-        {
-          "name": "Logistics & Supply Chain",
           "score": 13
         },
         {
+          "name": "Healthcare Services",
+          "score": 19
+        },
+        {
+          "name": "Human Resource Management",
+          "score": 18
+        },
+        {
+          "name": "Logistics & Supply Chain",
+          "score": 10
+        },
+        {
           "name": "Environmental Health & Safety",
-          "score": 14
+          "score": 15
         },
         {
           "name": "Communication & Information",
-          "score": 16
+          "score": 11
         },
         {
           "name": "Infrastructure Systems",
-          "score": 17
+          "score": 11
         }
       ],
       "description": "Power Outage represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
@@ -596,22 +798,30 @@
         {
           "id": 0,
           "title": "Power Outage mitigation 1",
-          "status": "Planned"
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
           "title": "Power Outage mitigation 2",
-          "status": "In Progress"
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
           "title": "Power Outage mitigation 3",
-          "status": "Complete"
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
           "title": "Power Outage mitigation 4",
-          "status": "Under Review"
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
@@ -630,95 +840,23 @@
           "title": "Power Outage threat vector 3",
           "severity": "Low"
         }
-      ]
-    },
-    {
-      "id": 8,
-      "name": "Active Threat",
-      "category": "Intentional",
-      "probability": 34,
-      "impact": 83,
-      "threats": 41,
-      "mitigations": 478,
-      "capabilities": [
-        {
-          "name": "Security & Protective Services",
-          "score": 13
-        },
-        {
-          "name": "Healthcare Services",
-          "score": 19
-        },
-        {
-          "name": "Human Resource Management",
-          "score": 18
-        },
-        {
-          "name": "Logistics & Supply Chain",
-          "score": 10
-        },
-        {
-          "name": "Environmental Health & Safety",
-          "score": 15
-        },
-        {
-          "name": "Communication & Information",
-          "score": 11
-        },
-        {
-          "name": "Infrastructure Systems",
-          "score": 11
-        }
       ],
-      "description": "Active Threat represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
-      "mitigationList": [
-        {
-          "id": 0,
-          "title": "Active Threat mitigation 1",
-          "status": "Planned"
-        },
-        {
-          "id": 1,
-          "title": "Active Threat mitigation 2",
-          "status": "In Progress"
-        },
-        {
-          "id": 2,
-          "title": "Active Threat mitigation 3",
-          "status": "Complete"
-        },
-        {
-          "id": 3,
-          "title": "Active Threat mitigation 4",
-          "status": "Under Review"
-        }
-      ],
-      "threatList": [
-        {
-          "id": 0,
-          "title": "Active Threat threat vector 1",
-          "severity": "High"
-        },
-        {
-          "id": 1,
-          "title": "Active Threat threat vector 2",
-          "severity": "Medium"
-        },
-        {
-          "id": 2,
-          "title": "Active Threat threat vector 3",
-          "severity": "Low"
-        }
+      "references": [
+        "FEMA hazard profile — Power Outage",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 9,
-      "name": "Cyber Attack",
-      "category": "Intentional",
+      "name": "Transport Accident",
+      "category": "Accidental",
+      "definition": "An accidental hazard originates from technological or industrial accidents, infrastructure failures, or human activities causing harm or disruption.",
+      "context": "Transport Accident scenario as recorded during the organizational set-up survey.",
       "probability": 82,
       "impact": 61,
       "threats": 42,
       "mitigations": 83,
+      "targetRisk": 50,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -749,55 +887,70 @@
           "score": 11
         }
       ],
-      "description": "Cyber Attack represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
+      "description": "Transport Accident represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
       "mitigationList": [
         {
           "id": 0,
-          "title": "Cyber Attack mitigation 1",
-          "status": "Planned"
+          "title": "Transport Accident mitigation 1",
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
-          "title": "Cyber Attack mitigation 2",
-          "status": "In Progress"
+          "title": "Transport Accident mitigation 2",
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
-          "title": "Cyber Attack mitigation 3",
-          "status": "Complete"
+          "title": "Transport Accident mitigation 3",
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
-          "title": "Cyber Attack mitigation 4",
-          "status": "Under Review"
+          "title": "Transport Accident mitigation 4",
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
         {
           "id": 0,
-          "title": "Cyber Attack threat vector 1",
+          "title": "Transport Accident threat vector 1",
           "severity": "High"
         },
         {
           "id": 1,
-          "title": "Cyber Attack threat vector 2",
+          "title": "Transport Accident threat vector 2",
           "severity": "Medium"
         },
         {
           "id": 2,
-          "title": "Cyber Attack threat vector 3",
+          "title": "Transport Accident threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Transport Accident",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 10,
-      "name": "Civil Disturbance",
+      "name": "Active Threat",
       "category": "Intentional",
+      "definition": "An intentional hazard is a danger created by deliberate human activity that could result in harm to people or the environment.",
+      "context": "Active Threat scenario as recorded during the organizational set-up survey.",
       "probability": 28,
       "impact": 68,
       "threats": 38,
       "mitigations": 391,
+      "targetRisk": 29,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -828,55 +981,70 @@
           "score": 18
         }
       ],
-      "description": "Civil Disturbance represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
+      "description": "Active Threat represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
       "mitigationList": [
         {
           "id": 0,
-          "title": "Civil Disturbance mitigation 1",
-          "status": "Planned"
+          "title": "Active Threat mitigation 1",
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
-          "title": "Civil Disturbance mitigation 2",
-          "status": "In Progress"
+          "title": "Active Threat mitigation 2",
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
-          "title": "Civil Disturbance mitigation 3",
-          "status": "Complete"
+          "title": "Active Threat mitigation 3",
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
-          "title": "Civil Disturbance mitigation 4",
-          "status": "Under Review"
+          "title": "Active Threat mitigation 4",
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
         {
           "id": 0,
-          "title": "Civil Disturbance threat vector 1",
+          "title": "Active Threat threat vector 1",
           "severity": "High"
         },
         {
           "id": 1,
-          "title": "Civil Disturbance threat vector 2",
+          "title": "Active Threat threat vector 2",
           "severity": "Medium"
         },
         {
           "id": 2,
-          "title": "Civil Disturbance threat vector 3",
+          "title": "Active Threat threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Active Threat",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 11,
-      "name": "Pandemic Influenza",
-      "category": "Biological",
+      "name": "Cyber Attack",
+      "category": "Intentional",
+      "definition": "An intentional hazard is a danger created by deliberate human activity that could result in harm to people or the environment.",
+      "context": "Cyber Attack scenario as recorded during the organizational set-up survey.",
       "probability": 41,
       "impact": 63,
       "threats": 17,
       "mitigations": 397,
+      "targetRisk": 32,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -907,55 +1075,70 @@
           "score": 13
         }
       ],
-      "description": "Pandemic Influenza represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
+      "description": "Cyber Attack represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
       "mitigationList": [
         {
           "id": 0,
-          "title": "Pandemic Influenza mitigation 1",
-          "status": "Planned"
+          "title": "Cyber Attack mitigation 1",
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
-          "title": "Pandemic Influenza mitigation 2",
-          "status": "In Progress"
+          "title": "Cyber Attack mitigation 2",
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
-          "title": "Pandemic Influenza mitigation 3",
-          "status": "Complete"
+          "title": "Cyber Attack mitigation 3",
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
-          "title": "Pandemic Influenza mitigation 4",
-          "status": "Under Review"
+          "title": "Cyber Attack mitigation 4",
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
         {
           "id": 0,
-          "title": "Pandemic Influenza threat vector 1",
+          "title": "Cyber Attack threat vector 1",
           "severity": "High"
         },
         {
           "id": 1,
-          "title": "Pandemic Influenza threat vector 2",
+          "title": "Cyber Attack threat vector 2",
           "severity": "Medium"
         },
         {
           "id": 2,
-          "title": "Pandemic Influenza threat vector 3",
+          "title": "Cyber Attack threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Cyber Attack",
+        "Organizational set-up survey (2023)"
       ]
     },
     {
       "id": 12,
-      "name": "Food-borne Outbreak",
-      "category": "Biological",
+      "name": "Civil Disturbance",
+      "category": "Intentional",
+      "definition": "An intentional hazard is a danger created by deliberate human activity that could result in harm to people or the environment.",
+      "context": "Civil Disturbance scenario as recorded during the organizational set-up survey.",
       "probability": 72,
       "impact": 84,
       "threats": 8,
       "mitigations": 141,
+      "targetRisk": 59,
       "capabilities": [
         {
           "name": "Security & Protective Services",
@@ -986,45 +1169,151 @@
           "score": 10
         }
       ],
-      "description": "Food-borne Outbreak represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
+      "description": "Civil Disturbance represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
       "mitigationList": [
         {
           "id": 0,
-          "title": "Food-borne Outbreak mitigation 1",
-          "status": "Planned"
+          "title": "Civil Disturbance mitigation 1",
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
         },
         {
           "id": 1,
-          "title": "Food-borne Outbreak mitigation 2",
-          "status": "In Progress"
+          "title": "Civil Disturbance mitigation 2",
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
         },
         {
           "id": 2,
-          "title": "Food-borne Outbreak mitigation 3",
-          "status": "Complete"
+          "title": "Civil Disturbance mitigation 3",
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
         },
         {
           "id": 3,
-          "title": "Food-borne Outbreak mitigation 4",
-          "status": "Under Review"
+          "title": "Civil Disturbance mitigation 4",
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
         }
       ],
       "threatList": [
         {
           "id": 0,
-          "title": "Food-borne Outbreak threat vector 1",
+          "title": "Civil Disturbance threat vector 1",
           "severity": "High"
         },
         {
           "id": 1,
-          "title": "Food-borne Outbreak threat vector 2",
+          "title": "Civil Disturbance threat vector 2",
           "severity": "Medium"
         },
         {
           "id": 2,
-          "title": "Food-borne Outbreak threat vector 3",
+          "title": "Civil Disturbance threat vector 3",
           "severity": "Low"
         }
+      ],
+      "references": [
+        "FEMA hazard profile — Civil Disturbance",
+        "Organizational set-up survey (2023)"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Terrorism",
+      "category": "Intentional",
+      "definition": "An intentional hazard is a danger created by deliberate human activity that could result in harm to people or the environment.",
+      "context": "Terrorism scenario as recorded during the organizational set-up survey.",
+      "probability": 26,
+      "impact": 45,
+      "threats": 51,
+      "mitigations": 29,
+      "targetRisk": 19,
+      "capabilities": [
+        {
+          "name": "Security & Protective Services",
+          "score": 14
+        },
+        {
+          "name": "Healthcare Services",
+          "score": 15
+        },
+        {
+          "name": "Human Resource Management",
+          "score": 19
+        },
+        {
+          "name": "Logistics & Supply Chain",
+          "score": 9
+        },
+        {
+          "name": "Environmental Health & Safety",
+          "score": 10
+        },
+        {
+          "name": "Communication & Information",
+          "score": 19
+        },
+        {
+          "name": "Infrastructure Systems",
+          "score": 12
+        }
+      ],
+      "description": "Terrorism represents a notable risk to organizational continuity. Assessment factors in historical frequency, geographic exposure, and current preparedness posture.",
+      "mitigationList": [
+        {
+          "id": 0,
+          "title": "Terrorism mitigation 1",
+          "capability": "Security & Protective Services",
+          "status": "Planned",
+          "dueDate": "2025-Q1"
+        },
+        {
+          "id": 1,
+          "title": "Terrorism mitigation 2",
+          "capability": "Healthcare Services",
+          "status": "In Progress",
+          "dueDate": "2025-Q2"
+        },
+        {
+          "id": 2,
+          "title": "Terrorism mitigation 3",
+          "capability": "Human Resource Management",
+          "status": "Complete",
+          "dueDate": "2025-Q3"
+        },
+        {
+          "id": 3,
+          "title": "Terrorism mitigation 4",
+          "capability": "Logistics & Supply Chain",
+          "status": "Under Review",
+          "dueDate": "2025-Q4"
+        }
+      ],
+      "threatList": [
+        {
+          "id": 0,
+          "title": "Terrorism threat vector 1",
+          "severity": "High"
+        },
+        {
+          "id": 1,
+          "title": "Terrorism threat vector 2",
+          "severity": "Medium"
+        },
+        {
+          "id": 2,
+          "title": "Terrorism threat vector 3",
+          "severity": "Low"
+        }
+      ],
+      "references": [
+        "FEMA hazard profile — Terrorism",
+        "Organizational set-up survey (2023)"
       ]
     }
   ]

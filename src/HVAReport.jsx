@@ -13,10 +13,12 @@ import { Doughnut, Bar } from "react-chartjs-2";
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 /* ------------------------------------------------------------------ *
- * HVA Readify — SPFx Report (prototype)
- * Mirrors the proposed UI: HVA Summary / Hazard Type / Selected Hazard
- * / Hazard Details, with doughnut + capability bar charts, a hazard
- * prioritization grid, calculation boxes, and PDF export.
+ * HVA Readify — Hazard Vulnerability Analysis report
+ * Structured to match the HVA report template: Risk Index by Hazard
+ * Type, Risk Index by Core Capability, Hazard Prioritization (overall /
+ * probability / impact), and per-hazard Risk Analysis, Risk
+ * Distribution, Threat Assessment, Mitigation Plan, and References.
+ * Categories: Natural, Accidental, Intentional.
  *
  * Loads hazard data from public/hazards.json at runtime. To use real
  * data, point the fetch at your API (or edit hazards.json directly) —
@@ -42,7 +44,13 @@ const RISK_COLORS = {
   Low: { bg: "#27ae60", fg: "#fff" },
 };
 
-const CATEGORIES = ["Natural", "Accidental", "Intentional", "Biological"];
+const CATEGORIES = ["Natural", "Accidental", "Intentional"];
+
+const CATEGORY_INTRO = {
+  Natural: "Natural hazards are events or processes in the natural environment that may cause loss of life, injury, or property damage — geologic, hydrologic, atmospheric, and biological.",
+  Accidental: "Accidental hazards originate from technological or industrial accidents, infrastructure failures, or specific human activities causing loss, damage, or environmental degradation.",
+  Intentional: "Intentional hazards are dangers created by deliberate human activity that could result in harm to people or the environment, such as terrorism or mass-casualty events.",
+};
 
 const CAPABILITIES = [
   "Security & Protective Services",
@@ -256,6 +264,23 @@ function HazardGrid({ rows, onSelect, selectedId }) {
   );
 }
 
+// ---- Ranked top-5 list (by a chosen metric) -----------------------
+function RankList({ rows, metric }) {
+  const top = [...rows].sort((a, b) => b[metric] - a[metric]).slice(0, 5);
+  const label = (r) =>
+    metric === "risk" ? r.risk : metric === "probability" ? r.probability : r.impact;
+  return (
+    <ol style={{ margin: 0, paddingLeft: 20, fontSize: 13 }}>
+      {top.map((r) => (
+        <li key={r.id} style={{ marginBottom: 6, display: "list-item" }}>
+          <span style={{ fontWeight: 600, color: T.ink }}>{r.name}</span>
+          <span style={{ float: "right", color: T.teal, fontWeight: 700 }}>{label(r)}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 // ---- Main component ------------------------------------------------
 export default function HVAReport() {
   const [data, setData] = useState(null);     // derived hazards once loaded
@@ -428,14 +453,22 @@ export default function HVAReport() {
         <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
           {(view === "summary" || view === "category") && (
             <>
+              {view === "category" && (
+                <Panel>
+                  <p style={{ margin: 0, fontSize: 13, color: T.sub, lineHeight: 1.5 }}>
+                    {CATEGORY_INTRO[activeCategory]}
+                  </p>
+                </Panel>
+              )}
               <div style={{ display: "grid", gridTemplateColumns: "minmax(220px,1fr) minmax(280px,1.4fr)", gap: 12 }}>
                 <Panel title={view === "category" ? `Risk Index — ${activeCategory}` : "Risk Index by Hazard Type"}>
                   <CategoryDoughnut rows={data} activeCategory={view === "category" ? activeCategory : null} />
                 </Panel>
-                <Panel title="Core Capabilities">
+                <Panel title="Risk Index by Core Capability">
                   <CapabilitiesBar capabilities={aggCaps} />
                 </Panel>
               </div>
+
               <Panel title="Hazard Prioritization">
                 <HazardGrid
                   rows={rows}
@@ -446,6 +479,18 @@ export default function HVAReport() {
                   Select a hazard row to open its detailed view.
                 </p>
               </Panel>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                <Panel title="Top 5 by Overall Risk">
+                  <RankList rows={rows} metric="risk" />
+                </Panel>
+                <Panel title="Top 5 by Probability">
+                  <RankList rows={rows} metric="probability" />
+                </Panel>
+                <Panel title="Top 5 by Impact">
+                  <RankList rows={rows} metric="impact" />
+                </Panel>
+              </div>
             </>
           )}
 
@@ -460,37 +505,35 @@ export default function HVAReport() {
               >← Back to summary</button>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <Panel title={selected.name}>
+                <Panel title={`${selected.name} — Risk Analysis`}>
                   <div style={{ display: "flex", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
                     <RiskPill band={selected.riskBand} />
                     <span style={{ fontSize: 12, color: T.sub }}>Category: <strong>{selected.category}</strong></span>
                   </div>
-                  <div style={{ display: "flex", gap: 16, marginBottom: 12 }}>
+                  <div style={{ display: "flex", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
                     <div><div style={{ fontSize: 11, color: T.sub }}>Probability</div><div style={{ fontWeight: 700, fontSize: 20 }}>{selected.probability}</div></div>
                     <div><div style={{ fontSize: 11, color: T.sub }}>Impact</div><div style={{ fontWeight: 700, fontSize: 20 }}>{selected.impact}</div></div>
-                    <div><div style={{ fontSize: 11, color: T.sub }}>Risk Score</div><div style={{ fontWeight: 700, fontSize: 20, color: T.teal }}>{selected.risk}</div></div>
+                    <div><div style={{ fontSize: 11, color: T.sub }}>Current Risk</div><div style={{ fontWeight: 700, fontSize: 20, color: T.teal }}>{selected.risk}</div></div>
+                    <div><div style={{ fontSize: 11, color: T.sub }}>Target Risk</div><div style={{ fontWeight: 700, fontSize: 20, color: "#27ae60" }}>{selected.targetRisk}</div></div>
                   </div>
-                  <p style={{ fontSize: 13, color: T.sub, lineHeight: 1.5, margin: 0 }}>{selected.description}</p>
+                  {/* current vs target benchmark bar */}
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ height: 10, background: T.line, borderRadius: 5, position: "relative" }}>
+                      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${selected.risk}%`, background: T.teal, borderRadius: 5 }} />
+                      <div title="Target" style={{ position: "absolute", left: `${selected.targetRisk}%`, top: -3, bottom: -3, width: 2, background: "#27ae60" }} />
+                    </div>
+                    <div style={{ fontSize: 10, color: T.sub, marginTop: 4 }}>Current risk vs target benchmark (green marker)</div>
+                  </div>
+                  <p style={{ fontSize: 12, color: T.ink, lineHeight: 1.5, margin: "0 0 6px" }}><strong>Definition:</strong> {selected.definition}</p>
+                  <p style={{ fontSize: 12, color: T.sub, lineHeight: 1.5, margin: 0 }}><strong>Context:</strong> {selected.context}</p>
                 </Panel>
-                <Panel title="Core Capabilities">
+                <Panel title="Risk Distribution by Core Capability">
                   <CapabilitiesBar capabilities={selected.capabilities} />
                 </Panel>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <Panel title="Mitigations">
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-                    <tbody>
-                      {selected.mitigationList.map((m) => (
-                        <tr key={m.id} style={{ borderBottom: `1px solid ${T.line}` }}>
-                          <td style={{ padding: "8px 4px" }}>{m.title}</td>
-                          <td style={{ padding: "8px 4px", textAlign: "right", color: T.sub }}>{m.status}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </Panel>
-                <Panel title="Threats">
+                <Panel title="Threat Assessment">
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                     <tbody>
                       {selected.threatList.map((t) => (
@@ -502,7 +545,41 @@ export default function HVAReport() {
                     </tbody>
                   </table>
                 </Panel>
+                <Panel title="Mitigation Plan (by core capability)">
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "6px 4px", color: T.sub, borderBottom: `2px solid ${T.line}` }}>Strategy</th>
+                        <th style={{ textAlign: "left", padding: "6px 4px", color: T.sub, borderBottom: `2px solid ${T.line}` }}>Capability</th>
+                        <th style={{ textAlign: "right", padding: "6px 4px", color: T.sub, borderBottom: `2px solid ${T.line}` }}>Due</th>
+                        <th style={{ textAlign: "right", padding: "6px 4px", color: T.sub, borderBottom: `2px solid ${T.line}` }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selected.mitigationList.map((m) => (
+                        <tr key={m.id} style={{ borderBottom: `1px solid ${T.line}` }}>
+                          <td style={{ padding: "7px 4px" }}>{m.title}</td>
+                          <td style={{ padding: "7px 4px", color: T.sub }}>{m.capability?.split(" ").slice(0, 2).join(" ")}</td>
+                          <td style={{ padding: "7px 4px", textAlign: "right", color: T.sub }}>{m.dueDate}</td>
+                          <td style={{ padding: "7px 4px", textAlign: "right", color: T.sub }}>{m.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </Panel>
               </div>
+
+              <Panel title="References">
+                {selected.references && selected.references.length ? (
+                  <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: T.sub }}>
+                    {selected.references.map((r, i) => (
+                      <li key={i} style={{ marginBottom: 4 }}>{r}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p style={{ margin: 0, fontSize: 12.5, color: T.sub }}>No references recorded.</p>
+                )}
+              </Panel>
             </>
           )}
         </div>

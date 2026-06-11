@@ -53,14 +53,20 @@ Each hazard in `hazards.json` supplies only *raw inputs*:
   "id": 0,
   "name": "Hurricane",
   "category": "Natural",
+  "definition": "A natural hazard is ...",
+  "context": "Scenario recorded during set-up survey.",
   "probability": 75,
   "impact": 37,
   "threats": 34,
   "mitigations": 319,
+  "targetRisk": 40,
   "capabilities": [{ "name": "...", "score": 10 }, ...],
   "description": "...",
-  "mitigationList": [{ "id": 0, "title": "...", "status": "Planned" }, ...],
-  "threatList": [{ "id": 0, "title": "...", "severity": "High" }, ...]
+  "mitigationList": [
+    { "id": 0, "title": "...", "capability": "...", "status": "Planned", "dueDate": "2025-Q1" }, ...
+  ],
+  "threatList": [{ "id": 0, "title": "...", "severity": "High" }, ...],
+  "references": ["FEMA hazard profile — Hurricane", ...]
 }
 ```
 
@@ -68,7 +74,7 @@ The derived fields — `risk`, `riskBand`, `probBand`, `impactBand` — are
 computed in `deriveHazard()` inside `HVAReport.jsx`. That's the single
 place to drop in the client's real scoring formula.
 
-`category` must be one of: Natural, Accidental, Intentional, Biological.
+`category` must be one of: Natural, Accidental, Intentional.
 
 ### Regenerating the sample data
 
