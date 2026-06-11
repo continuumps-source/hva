@@ -86,13 +86,36 @@ The report has an **+ Add Hazard** button. Added hazards:
 
 To make additions permanent and shared with everyone:
 
-1. Click **Export hazards.json** — it downloads the full current dataset.
+1. Click **Export data** — it downloads the full current dataset
+   (hazards, actions, and documents) as `hazards.json`.
 2. Replace `public/hazards.json` in the project with that file.
-3. Commit and push (or re-deploy). Now the additions ship with the site
-   and everyone sees them.
+3. Commit and push (or re-deploy). Now everything ships with the site
+   and everyone sees it.
 
-**Clear my additions** removes the hazards you added in this browser
-(the published ones from the file stay).
+**Reset** removes the hazards, actions, and documents you added in this
+browser (the published ones from the file stay).
+
+### Actions and documents
+
+Open any hazard (click a row in Hazard Prioritization) to reach its
+detail view, which has two extra panels:
+
+- **Documents** — attach a *link* to a document stored elsewhere
+  (SharePoint, Google Drive, OneDrive, etc.). The app stores the label
+  and URL and opens it in a new tab. No file upload — links have no size
+  limit and keep documents under your organization's own access control.
+- **Actions** — assign an action with an owner, due date, status, notes,
+  and an optional link to a specific mitigation. Status is editable
+  inline (Not started / In progress / Blocked / Complete).
+
+The **Action Plan** tab aggregates every action across all hazards into
+one master list sorted by due date — the report template's "Hazard
+Mitigation Plan." Actions and documents are saved in your browser and
+included in **Export data**, so committing the exported file shares them
+with everyone, exactly like hazards.
+
+*(Document upload — storing the actual file rather than a link — needs a
+backend and isn't built; the data model already leaves room for it.)*
 
 ### Regenerating the sample data
 

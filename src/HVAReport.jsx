@@ -181,6 +181,7 @@ function CategoryDoughnut({ rows, activeCategory }) {
     }],
   };
   const total = counts.reduce((a, b) => a + b, 0);
+  const pct = (v) => (total ? Math.round((v / total) * 100) : 0);
   return (
     <div style={{ position: "relative", height: 210 }}>
       <Doughnut
@@ -188,8 +189,30 @@ function CategoryDoughnut({ rows, activeCategory }) {
         options={{
           cutout: "68%", maintainAspectRatio: false,
           plugins: {
-            legend: { position: "bottom", labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: "circle", font: CHART_FONT, color: "#475569", padding: 14 } },
-            tooltip: { backgroundColor: "#0f172a", padding: 10, cornerRadius: 8, titleFont: CHART_FONT, bodyFont: CHART_FONT },
+            legend: {
+              position: "bottom",
+              labels: {
+                boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: "circle",
+                font: CHART_FONT, color: "#475569", padding: 12,
+                generateLabels: (chart) => {
+                  const ds = chart.data.datasets[0];
+                  return chart.data.labels.map((lab, i) => ({
+                    text: `${lab} — ${pct(ds.data[i])}%`,
+                    fillStyle: palette[i],
+                    strokeStyle: palette[i],
+                    pointStyle: "circle",
+                    index: i,
+                  }));
+                },
+              },
+            },
+            tooltip: {
+              backgroundColor: "#0f172a", padding: 10, cornerRadius: 8,
+              titleFont: CHART_FONT, bodyFont: CHART_FONT,
+              callbacks: {
+                label: (ctx) => ` ${ctx.label}: ${ctx.parsed} (${pct(ctx.parsed)}%)`,
+              },
+            },
           },
         }}
       />
@@ -450,17 +473,188 @@ function AddHazardForm({ onSave, onCancel }) {
   );
 }
 
+// ---- Reusable modal shell -----------------------------------------
+function Modal({ title, subtitle, children, onCancel }) {
+  return (
+    <div
+      onClick={onCancel}
+      style={{
+        position: "fixed", inset: 0, background: "rgba(15,23,42,0.45)",
+        display: "flex", alignItems: "flex-start", justifyContent: "center",
+        padding: 24, zIndex: 1000, overflowY: "auto",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fff", borderRadius: 16, padding: 24, width: "100%",
+          maxWidth: 480, boxShadow: "0 10px 40px rgba(0,0,0,0.2)", fontFamily: T.body,
+        }}
+      >
+        <h2 style={{ margin: "0 0 4px", fontFamily: T.display, fontSize: 19, fontWeight: 800, color: T.ink, letterSpacing: -0.3 }}>{title}</h2>
+        {subtitle && <p style={{ margin: "0 0 18px", fontSize: 12.5, color: T.subSoft }}>{subtitle}</p>}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+const fieldLabel = { fontSize: 12, fontWeight: 600, color: "var(--slate)", display: "block", marginBottom: 4 };
+const fieldInput = {
+  width: "100%", padding: "8px 10px", border: "1px solid var(--hairline)", borderRadius: 9,
+  fontSize: 13, boxSizing: "border-box", fontFamily: "inherit",
+};
+const modalBtnRow = { display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 4 };
+const cancelBtn = { padding: "8px 16px", border: "1px solid var(--hairline)", borderRadius: 9, background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" };
+const saveBtn = { padding: "8px 16px", border: "none", borderRadius: 9, background: "var(--accent)", color: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" };
+
+function StatusPill({ status, onChange }) {
+  const c = STATUS_COLOR[status] || STATUS_COLOR["Not started"];
+  if (onChange) {
+    return (
+      <select
+        value={status}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          background: c.bg, color: c.fg, border: "none", borderRadius: 999,
+          padding: "3px 10px", fontSize: 11.5, fontWeight: 600, cursor: "pointer",
+          fontFamily: "inherit", appearance: "none", textAlign: "center",
+        }}
+      >
+        {ACTION_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+      </select>
+    );
+  }
+  return (
+    <span style={{ background: c.bg, color: c.fg, borderRadius: 999, padding: "3px 10px", fontSize: 11.5, fontWeight: 600 }}>{status}</span>
+  );
+}
+
+// ---- Add Action form ----------------------------------------------
+function AddActionForm({ hazard, onSave, onCancel }) {
+  const [f, setF] = useState({ title: "", owner: "", due: "", status: "Not started", notes: "", mitigationId: "" });
+  const [err, setErr] = useState("");
+  const set = (k, v) => setF((s) => ({ ...s, [k]: v }));
+
+  function submit() {
+    if (!f.title.trim()) { setErr("An action title is required."); return; }
+    onSave({
+      hazardId: hazard.id,
+      mitigationId: f.mitigationId === "" ? null : Number(f.mitigationId),
+      title: f.title.trim(),
+      owner: f.owner.trim(),
+      due: f.due,
+      status: f.status,
+      notes: f.notes.trim(),
+    });
+  }
+
+  return (
+    <Modal title="Assign action" subtitle={`For hazard: ${hazard.name}`} onCancel={onCancel}>
+      <div style={{ marginBottom: 12 }}>
+        <label style={fieldLabel}>Action *</label>
+        <input style={fieldInput} value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Review evacuation routes" />
+      </div>
+      {hazard.mitigationList && hazard.mitigationList.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <label style={fieldLabel}>Linked mitigation (optional)</label>
+          <select style={fieldInput} value={f.mitigationId} onChange={(e) => set("mitigationId", e.target.value)}>
+            <option value="">— none —</option>
+            {hazard.mitigationList.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
+          </select>
+        </div>
+      )}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+        <div>
+          <label style={fieldLabel}>Owner</label>
+          <input style={fieldInput} value={f.owner} onChange={(e) => set("owner", e.target.value)} placeholder="Name or team" />
+        </div>
+        <div>
+          <label style={fieldLabel}>Due date</label>
+          <input type="date" style={fieldInput} value={f.due} onChange={(e) => set("due", e.target.value)} />
+        </div>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={fieldLabel}>Status</label>
+        <select style={fieldInput} value={f.status} onChange={(e) => set("status", e.target.value)}>
+          {ACTION_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <label style={fieldLabel}>Notes</label>
+        <textarea style={{ ...fieldInput, minHeight: 56, resize: "vertical" }} value={f.notes} onChange={(e) => set("notes", e.target.value)} />
+      </div>
+      {err && <p style={{ color: "#b91c1c", fontSize: 13, margin: "0 0 12px" }}>{err}</p>}
+      <p style={{ fontSize: 11, color: "var(--slate-soft)", margin: "0 0 16px" }}>Saved in this browser. Use “Export data” to make it permanent and shared.</p>
+      <div style={modalBtnRow}>
+        <button onClick={onCancel} style={cancelBtn}>Cancel</button>
+        <button onClick={submit} style={saveBtn}>Save action</button>
+      </div>
+    </Modal>
+  );
+}
+
+// ---- Attach Document form -----------------------------------------
+function AddDocumentForm({ hazard, onSave, onCancel }) {
+  const [f, setF] = useState({ label: "", url: "" });
+  const [err, setErr] = useState("");
+  const set = (k, v) => setF((s) => ({ ...s, [k]: v }));
+
+  function submit() {
+    if (!f.label.trim()) { setErr("A document name is required."); return; }
+    let url = f.url.trim();
+    if (!url) { setErr("Paste a link to the document."); return; }
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    onSave({ hazardId: hazard.id, label: f.label.trim(), url });
+  }
+
+  return (
+    <Modal title="Attach document" subtitle={`For hazard: ${hazard.name}`} onCancel={onCancel}>
+      <div style={{ marginBottom: 12 }}>
+        <label style={fieldLabel}>Document name *</label>
+        <input style={fieldInput} value={f.label} onChange={(e) => set("label", e.target.value)} placeholder="e.g. Evacuation plan (PDF)" />
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <label style={fieldLabel}>Link *</label>
+        <input style={fieldInput} value={f.url} onChange={(e) => set("url", e.target.value)} placeholder="SharePoint / Drive / OneDrive URL" />
+      </div>
+      {err && <p style={{ color: "#b91c1c", fontSize: 13, margin: "0 0 12px" }}>{err}</p>}
+      <p style={{ fontSize: 11, color: "var(--slate-soft)", margin: "0 0 16px" }}>
+        Links to a document stored elsewhere (no upload). Saved in this browser; use “Export data” to share.
+      </p>
+      <div style={modalBtnRow}>
+        <button onClick={onCancel} style={cancelBtn}>Cancel</button>
+        <button onClick={submit} style={saveBtn}>Attach link</button>
+      </div>
+    </Modal>
+  );
+}
+
 // ---- localStorage helpers (browser-only additions) ----------------
 const LS_KEY = "hva_added_hazards_v1";
-function loadAdded() {
+const LS_ACTIONS = "hva_actions_v1";
+const LS_DOCS = "hva_documents_v1";
+
+function lsLoad(key) {
   try {
-    const raw = localStorage.getItem(LS_KEY);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : [];
   } catch { return []; }
 }
-function saveAdded(list) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch { /* ignore */ }
+function lsSave(key, list) {
+  try { localStorage.setItem(key, JSON.stringify(list)); } catch { /* ignore */ }
 }
+// kept for backwards-compatibility with existing calls
+function loadAdded() { return lsLoad(LS_KEY); }
+function saveAdded(list) { lsSave(LS_KEY, list); }
+
+const ACTION_STATUSES = ["Not started", "In progress", "Blocked", "Complete"];
+const STATUS_COLOR = {
+  "Not started": { bg: "var(--canvas-2)", fg: "var(--slate)" },
+  "In progress": { bg: "var(--accent-soft)", fg: "var(--accent-ink)" },
+  "Blocked": { bg: "#fef2f2", fg: "#b91c1c" },
+  "Complete": { bg: "#f0fdf4", fg: "#15803d" },
+};
 
 // ---- Main component ------------------------------------------------
 export default function HVAReport() {
@@ -471,7 +665,51 @@ export default function HVAReport() {
   const [selectedId, setSelectedId] = useState(null);
   const [exporting, setExporting] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [actions, setActions] = useState([]);     // {id, hazardId, mitigationId?, title, owner, due, status, notes}
+  const [documents, setDocuments] = useState([]); // {id, hazardId, label, url}
+  const [showActionFor, setShowActionFor] = useState(null); // hazardId when adding an action
+  const [showDocFor, setShowDocFor] = useState(null);       // hazardId when adding a document
   const reportRef = useRef(null);
+
+  function addAction(rec) {
+    setActions((prev) => {
+      const nextId = prev.reduce((m, a) => Math.max(m, a.id), -1) + 1;
+      const next = [...prev, { ...rec, id: nextId }];
+      lsSave(LS_ACTIONS, next);
+      return next;
+    });
+    setShowActionFor(null);
+  }
+  function updateActionStatus(id, status) {
+    setActions((prev) => {
+      const next = prev.map((a) => (a.id === id ? { ...a, status } : a));
+      lsSave(LS_ACTIONS, next);
+      return next;
+    });
+  }
+  function deleteAction(id) {
+    setActions((prev) => {
+      const next = prev.filter((a) => a.id !== id);
+      lsSave(LS_ACTIONS, next);
+      return next;
+    });
+  }
+  function addDocument(rec) {
+    setDocuments((prev) => {
+      const nextId = prev.reduce((m, d) => Math.max(m, d.id), -1) + 1;
+      const next = [...prev, { ...rec, id: nextId }];
+      lsSave(LS_DOCS, next);
+      return next;
+    });
+    setShowDocFor(null);
+  }
+  function deleteDocument(id) {
+    setDocuments((prev) => {
+      const next = prev.filter((d) => d.id !== id);
+      lsSave(LS_DOCS, next);
+      return next;
+    });
+  }
 
   // Load hazard data from the JSON file, then merge any hazards this
   // browser has added locally (localStorage). Swap the fetch for a real
@@ -490,6 +728,23 @@ export default function HVAReport() {
         const merged = [...fromFile, ...added];
         setRawHazards(merged);
         setSelectedId(merged[0]?.id ?? null);
+        // Merge any actions/documents shipped in the file with local ones,
+        // de-duplicating by a stable signature so re-imports don't double up.
+        const localActs = lsLoad(LS_ACTIONS);
+        const localDocs = lsLoad(LS_DOCS);
+        const fileActs = json.actions || [];
+        const fileDocs = json.documents || [];
+        const sigA = (a) => `${a.hazardId}|${a.title}|${a.owner}|${a.due}`;
+        const sigD = (d) => `${d.hazardId}|${d.url}`;
+        const seenA = new Set(localActs.map(sigA));
+        const seenD = new Set(localDocs.map(sigD));
+        const mergedActs = [...localActs, ...fileActs.filter((a) => !seenA.has(sigA(a)))];
+        const mergedDocs = [...localDocs, ...fileDocs.filter((d) => !seenD.has(sigD(d)))];
+        // reassign ids to stay unique after merge
+        const reA = mergedActs.map((a, i) => ({ ...a, id: i }));
+        const reD = mergedDocs.map((d, i) => ({ ...d, id: i }));
+        setActions(reA); lsSave(LS_ACTIONS, reA);
+        setDocuments(reD); lsSave(LS_DOCS, reD);
       })
       .catch((e) => { if (!cancelled) setLoadError(e.message); });
     return () => { cancelled = true; };
@@ -518,13 +773,15 @@ export default function HVAReport() {
   }
 
   // Export the full current dataset as a clean hazards.json (no derived
-  // fields). Commit this file to the repo to share additions with everyone.
+  // fields), including actions and documents. Commit this file to the
+  // repo to share everything with everyone.
   function exportData() {
     const clean = (rawHazards || []).map((h) => {
       const { risk, riskBand, probBand, impactBand, ...rest } = h;
       return rest;
     });
-    const blob = new Blob([JSON.stringify({ hazards: clean }, null, 2)], { type: "application/json" });
+    const payload = { hazards: clean, actions, documents };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = "hazards.json";
@@ -604,6 +861,7 @@ export default function HVAReport() {
   const tabs = [
     { id: "summary", label: "HVA Summary" },
     ...CATEGORIES.map((c) => ({ id: c, label: c, isCat: true })),
+    { id: "actions", label: "Action Plan", isActions: true },
   ];
 
   if (loadError) {
@@ -676,12 +934,15 @@ export default function HVAReport() {
         background: T.bg2, borderRadius: 11, flexWrap: "wrap",
       }}>
         {tabs.map((t) => {
-          const active = t.isCat ? (view === "category" && activeCategory === t.id) : (view === t.id || (view === "details" && !t.isCat && t.id === "summary"));
+          const active = t.isActions ? view === "actions"
+            : t.isCat ? (view === "category" && activeCategory === t.id)
+            : (view === t.id || (view === "details" && !t.isCat && t.id === "summary"));
           return (
             <button
               key={t.id}
               onClick={() => {
-                if (t.isCat) { setView("category"); setActiveCategory(t.id); }
+                if (t.isActions) { setView("actions"); setActiveCategory(null); }
+                else if (t.isCat) { setView("category"); setActiveCategory(t.id); }
                 else { setView("summary"); setActiveCategory(null); }
               }}
               style={{
@@ -698,6 +959,12 @@ export default function HVAReport() {
       </div>
 
       {showAdd && <AddHazardForm onSave={addHazard} onCancel={() => setShowAdd(false)} />}
+      {showActionFor != null && data && (
+        <AddActionForm hazard={data.find((h) => h.id === showActionFor)} onSave={addAction} onCancel={() => setShowActionFor(null)} />
+      )}
+      {showDocFor != null && data && (
+        <AddDocumentForm hazard={data.find((h) => h.id === showDocFor)} onSave={addDocument} onCancel={() => setShowDocFor(null)} />
+      )}
 
       <div ref={reportRef} style={{ display: "grid", gridTemplateColumns: "168px 1fr", gap: 16 }}>
         {/* Left stat rail */}
@@ -838,6 +1105,109 @@ export default function HVAReport() {
                   </ul>
                 ) : (
                   <p style={{ margin: 0, fontSize: 12.5, color: T.sub }}>No references recorded.</p>
+                )}
+              </Panel>
+
+              <Panel
+                title="Documents"
+                action={<button className="no-print" onClick={() => setShowDocFor(selected.id)} style={{ border: `1px solid ${T.line}`, background: T.panel, color: T.accentInk, borderRadius: 8, padding: "5px 11px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: T.body }}>+ Attach</button>}
+              >
+                {(() => {
+                  const docs = documents.filter((d) => d.hazardId === selected.id);
+                  if (!docs.length) return <p style={{ margin: 0, fontSize: 12.5, color: T.subSoft }}>No documents linked. Attach a link to a plan, report, or procedure.</p>;
+                  return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {docs.map((d) => (
+                        <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", border: `1px solid ${T.line}`, borderRadius: 9 }}>
+                          <a href={d.url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, color: T.accentInk, fontSize: 13, fontWeight: 600, textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.label} ↗</a>
+                          <button className="no-print" onClick={() => deleteDocument(d.id)} title="Remove" style={{ border: "none", background: "transparent", color: T.subSoft, cursor: "pointer", fontSize: 13 }}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </Panel>
+
+              <Panel
+                title="Actions"
+                action={<button className="no-print" onClick={() => setShowActionFor(selected.id)} style={{ border: `1px solid ${T.line}`, background: T.panel, color: T.accentInk, borderRadius: 8, padding: "5px 11px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: T.body }}>+ Assign action</button>}
+              >
+                {(() => {
+                  const acts = actions.filter((a) => a.hazardId === selected.id);
+                  if (!acts.length) return <p style={{ margin: 0, fontSize: 12.5, color: T.subSoft }}>No actions assigned. Assign an action to drive risk reduction.</p>;
+                  return (
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                        <thead><tr>
+                          {["Action", "Owner", "Due", "Status", ""].map((h, i) => (
+                            <th key={i} style={{ textAlign: i > 1 && i < 4 ? "left" : "left", padding: "6px 8px", fontSize: 10.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600, borderBottom: `1px solid ${T.line}` }}>{h}</th>
+                          ))}
+                        </tr></thead>
+                        <tbody>
+                          {acts.map((a) => {
+                            const mit = selected.mitigationList?.find((m) => m.id === a.mitigationId);
+                            return (
+                              <tr key={a.id} style={{ borderBottom: `1px solid ${T.line}` }}>
+                                <td style={{ padding: "8px 8px", color: T.ink, fontWeight: 600 }}>
+                                  {a.title}
+                                  {mit && <div style={{ fontSize: 11, color: T.subSoft, fontWeight: 400 }}>↳ {mit.title}</div>}
+                                  {a.notes && <div style={{ fontSize: 11, color: T.subSoft, fontWeight: 400 }}>{a.notes}</div>}
+                                </td>
+                                <td style={{ padding: "8px 8px", color: T.sub }}>{a.owner || "—"}</td>
+                                <td className="tnum" style={{ padding: "8px 8px", color: T.sub }}>{a.due || "—"}</td>
+                                <td style={{ padding: "8px 8px" }}><StatusPill status={a.status} onChange={(s) => updateActionStatus(a.id, s)} /></td>
+                                <td className="no-print" style={{ padding: "8px 8px", textAlign: "right" }}>
+                                  <button onClick={() => deleteAction(a.id)} title="Delete" style={{ border: "none", background: "transparent", color: T.subSoft, cursor: "pointer", fontSize: 13 }}>✕</button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                })()}
+              </Panel>
+            </>
+          )}
+
+          {view === "actions" && (
+            <>
+              <Panel title="Hazard Mitigation Plan — all actions">
+                {actions.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: 13, color: T.subSoft }}>
+                    No actions yet. Open any hazard and use “Assign action” to build the plan.
+                  </p>
+                ) : (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead><tr>
+                        {["Action", "Hazard", "Owner", "Due", "Status", ""].map((h, i) => (
+                          <th key={i} style={{ textAlign: "left", padding: "9px 10px", fontSize: 10.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600, borderBottom: `1px solid ${T.line}` }}>{h}</th>
+                        ))}
+                      </tr></thead>
+                      <tbody>
+                        {[...actions].sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999")).map((a) => {
+                          const hz = (data || []).find((h) => h.id === a.hazardId);
+                          return (
+                            <tr key={a.id} style={{ borderBottom: `1px solid ${T.line}` }}>
+                              <td style={{ padding: "9px 10px", color: T.ink, fontWeight: 600 }}>
+                                {a.title}
+                                {a.notes && <div style={{ fontSize: 11, color: T.subSoft, fontWeight: 400 }}>{a.notes}</div>}
+                              </td>
+                              <td style={{ padding: "9px 10px", color: T.sub }}>{hz ? hz.name : "—"}</td>
+                              <td style={{ padding: "9px 10px", color: T.sub }}>{a.owner || "—"}</td>
+                              <td className="tnum" style={{ padding: "9px 10px", color: T.sub }}>{a.due || "—"}</td>
+                              <td style={{ padding: "9px 10px" }}><StatusPill status={a.status} onChange={(s) => updateActionStatus(a.id, s)} /></td>
+                              <td className="no-print" style={{ padding: "9px 10px", textAlign: "right" }}>
+                                <button onClick={() => deleteAction(a.id)} title="Delete" style={{ border: "none", background: "transparent", color: T.subSoft, cursor: "pointer", fontSize: 13 }}>✕</button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </Panel>
             </>
