@@ -25,23 +25,36 @@ ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Le
  * the shape and everything downstream stays the same.
  * ------------------------------------------------------------------ */
 
-// ---- Theme tokens (matches the HVA Readify enterprise look) --------
+// ---- Design tokens (defined as CSS vars in index.html) ------------
 const T = {
-  teal: "#0b7c8c",
-  tealDark: "#075b66",
-  ink: "#1f2a37",
-  sub: "#5b6b7b",
-  line: "#e3e8ee",
-  panel: "#ffffff",
-  bg: "#eef2f5",
-  chip: "#0b7c8c",
+  ink: "var(--ink)",
+  sub: "var(--slate)",
+  subSoft: "var(--slate-soft)",
+  line: "var(--hairline)",
+  panel: "var(--surface)",
+  bg: "var(--canvas)",
+  bg2: "var(--canvas-2)",
+  accent: "var(--accent)",
+  accentSoft: "var(--accent-soft)",
+  accentInk: "var(--accent-ink)",
+  shadowSm: "var(--shadow-sm)",
+  shadowMd: "var(--shadow-md)",
+  radius: "var(--radius)",
+  radiusSm: "var(--radius-sm)",
+  display: "var(--font-display)",
+  body: "var(--font-body)",
 };
 
 const RISK_COLORS = {
-  "Very High": { bg: "#c0392b", fg: "#fff" },
-  High: { bg: "#e67e22", fg: "#fff" },
-  Medium: { bg: "#f1c40f", fg: "#3a2f00" },
-  Low: { bg: "#27ae60", fg: "#fff" },
+  "Very High": { bg: "var(--risk-vhigh)", fg: "#fff" },
+  High: { bg: "var(--risk-high)", fg: "#fff" },
+  Medium: { bg: "var(--risk-med)", fg: "#fff" },
+  Low: { bg: "var(--risk-low)", fg: "#fff" },
+};
+
+// raw hex for chart.js (can't take CSS vars)
+const RISK_HEX = {
+  vhigh: "#dc2626", high: "#ea580c", med: "#d97706", low: "#16a34a",
 };
 
 const CATEGORIES = ["Natural", "Accidental", "Intentional"];
@@ -92,45 +105,57 @@ function deriveHazard(h) {
 }
 
 // ---- Small UI atoms ------------------------------------------------
-function StatBox({ label, value }) {
+function StatBox({ label, value, accent }) {
   return (
     <div style={{
-      border: `1px solid ${T.line}`, borderRadius: 8, padding: "12px 14px",
-      background: T.panel, minWidth: 120, flex: 1,
+      borderRadius: T.radiusSm, padding: "14px 16px",
+      background: T.panel, boxShadow: T.shadowSm, border: `1px solid ${T.line}`,
+      minWidth: 120, flex: 1,
     }}>
-      <div style={{ fontSize: 11, color: T.sub, textTransform: "uppercase", letterSpacing: 0.4, fontWeight: 600 }}>
+      <div style={{ fontSize: 10.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.6, fontWeight: 600 }}>
         {label}
       </div>
-      <div style={{ fontSize: 30, fontWeight: 700, color: T.teal, lineHeight: 1.1, marginTop: 4 }}>
+      <div className="tnum" style={{
+        fontFamily: T.display, fontSize: 32, fontWeight: 800,
+        color: accent ? T.accent : T.ink, lineHeight: 1.05, marginTop: 6, letterSpacing: -0.5,
+      }}>
         {value}
       </div>
     </div>
   );
 }
 
-function RiskPill({ band }) {
+function RiskPill({ band, small }) {
   const c = RISK_COLORS[band] || RISK_COLORS.Low;
   return (
     <span style={{
-      background: c.bg, color: c.fg, padding: "2px 10px", borderRadius: 4,
-      fontSize: 12, fontWeight: 600, display: "inline-block", minWidth: 70, textAlign: "center",
+      background: c.bg, color: c.fg,
+      padding: small ? "2px 8px" : "3px 11px", borderRadius: 999,
+      fontSize: small ? 11 : 11.5, fontWeight: 600, display: "inline-block",
+      minWidth: small ? 56 : 68, textAlign: "center", letterSpacing: 0.2,
     }}>
       {band}
     </span>
   );
 }
 
-function Panel({ title, children, style }) {
+function Panel({ title, action, children, style }) {
   return (
     <section style={{
-      background: T.panel, border: `1px solid ${T.line}`, borderRadius: 10,
-      padding: 16, ...style,
+      background: T.panel, borderRadius: T.radius, boxShadow: T.shadowSm,
+      border: `1px solid ${T.line}`, padding: 20, ...style,
     }}>
       {title && (
-        <h3 style={{
-          margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: T.ink,
-          borderBottom: `2px solid ${T.line}`, paddingBottom: 8,
-        }}>{title}</h3>
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          margin: "0 0 16px",
+        }}>
+          <h3 style={{
+            margin: 0, fontFamily: T.display, fontSize: 13.5, fontWeight: 700,
+            color: T.ink, letterSpacing: -0.1,
+          }}>{title}</h3>
+          {action}
+        </div>
       )}
       {children}
     </section>
@@ -138,36 +163,42 @@ function Panel({ title, children, style }) {
 }
 
 // ---- Charts --------------------------------------------------------
+const CHART_FONT = { family: "Inter, system-ui, sans-serif", size: 11 };
+
 function CategoryDoughnut({ rows, activeCategory }) {
   const counts = CATEGORIES.map(
     (c) => rows.filter((r) => r.category === c).reduce((a, r) => a + r.risk, 0)
   );
-  const palette = ["#0b7c8c", "#e67e22", "#8e44ad", "#16a085"];
+  // indigo-led categorical ramp, calm and distinct
+  const palette = ["#4338ca", "#0891b2", "#7c3aed", "#0d9488"];
   const data = {
     labels: CATEGORIES,
     datasets: [{
       data: counts,
       backgroundColor: palette.map((p, i) =>
-        activeCategory && CATEGORIES[i] !== activeCategory ? p + "44" : p),
-      borderWidth: 2, borderColor: "#fff",
+        activeCategory && CATEGORIES[i] !== activeCategory ? p + "33" : p),
+      borderWidth: 3, borderColor: "#fff", hoverOffset: 6,
     }],
   };
   const total = counts.reduce((a, b) => a + b, 0);
   return (
-    <div style={{ position: "relative", height: 200 }}>
+    <div style={{ position: "relative", height: 210 }}>
       <Doughnut
         data={data}
         options={{
-          cutout: "65%", maintainAspectRatio: false,
-          plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } },
+          cutout: "68%", maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom", labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: "circle", font: CHART_FONT, color: "#475569", padding: 14 } },
+            tooltip: { backgroundColor: "#0f172a", padding: 10, cornerRadius: 8, titleFont: CHART_FONT, bodyFont: CHART_FONT },
+          },
         }}
       />
       <div style={{
-        position: "absolute", top: "42%", left: 0, right: 0, textAlign: "center",
+        position: "absolute", top: "38%", left: 0, right: 0, textAlign: "center",
         pointerEvents: "none",
       }}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: T.ink }}>{total}</div>
-        <div style={{ fontSize: 10, color: T.sub }}>Total Risk Index</div>
+        <div className="tnum" style={{ fontFamily: T.display, fontSize: 26, fontWeight: 800, color: T.ink, letterSpacing: -0.5 }}>{total}</div>
+        <div style={{ fontSize: 9.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.6, fontWeight: 600 }}>Total Risk Index</div>
       </div>
     </div>
   );
@@ -179,20 +210,23 @@ function CapabilitiesBar({ capabilities }) {
     datasets: [{
       data: capabilities.map((c) => c.score),
       backgroundColor: capabilities.map((c) =>
-        c.score >= 18 ? "#c0392b" : c.score >= 14 ? "#e67e22" : "#27ae60"),
-      borderRadius: 4,
+        c.score >= 18 ? RISK_HEX.vhigh : c.score >= 14 ? RISK_HEX.high : RISK_HEX.low),
+      borderRadius: 6, borderSkipped: false, barPercentage: 0.7, categoryPercentage: 0.8,
     }],
   };
   return (
-    <div style={{ height: 210 }}>
+    <div style={{ height: 218 }}>
       <Bar
         data={data}
         options={{
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: { backgroundColor: "#0f172a", padding: 10, cornerRadius: 8, titleFont: CHART_FONT, bodyFont: CHART_FONT },
+          },
           scales: {
-            y: { beginAtZero: true, max: 20, ticks: { font: { size: 10 } } },
-            x: { ticks: { font: { size: 9 }, maxRotation: 40, minRotation: 40 } },
+            y: { beginAtZero: true, max: 20, grid: { color: "#f1f5f9" }, border: { display: false }, ticks: { font: CHART_FONT, color: "#94a3b8", stepSize: 5 } },
+            x: { grid: { display: false }, border: { display: false }, ticks: { font: { ...CHART_FONT, size: 9 }, color: "#64748b", maxRotation: 40, minRotation: 40 } },
           },
         }}
       />
@@ -217,17 +251,17 @@ function HazardGrid({ rows, onSelect, selectedId }) {
     <th
       onClick={() => setSort((s) => ({ key, dir: s.key === key && s.dir === "desc" ? "asc" : "desc" }))}
       style={{
-        textAlign: align, padding: "10px 12px", fontSize: 12, color: T.sub,
-        cursor: "pointer", userSelect: "none", borderBottom: `2px solid ${T.line}`,
-        whiteSpace: "nowrap",
+        textAlign: align, padding: "10px 14px", fontSize: 10.5, color: T.subSoft,
+        cursor: "pointer", userSelect: "none", borderBottom: `1px solid ${T.line}`,
+        whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: 0.6, fontWeight: 600,
       }}
     >
-      {label}{sort.key === key ? (sort.dir === "asc" ? " ▲" : " ▼") : ""}
+      {label}{sort.key === key ? (sort.dir === "asc" ? " ↑" : " ↓") : ""}
     </th>
   );
 
   return (
-    <div style={{ overflowX: "auto" }}>
+    <div style={{ overflowX: "auto", margin: "0 -4px" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr>
@@ -244,18 +278,21 @@ function HazardGrid({ rows, onSelect, selectedId }) {
             <tr
               key={r.id}
               onClick={() => onSelect(r.id)}
+              onMouseEnter={(e) => { if (selectedId !== r.id) e.currentTarget.style.background = "var(--canvas)"; }}
+              onMouseLeave={(e) => { if (selectedId !== r.id) e.currentTarget.style.background = "transparent"; }}
               style={{
                 cursor: "pointer",
-                background: selectedId === r.id ? "#e6f3f5" : "transparent",
+                background: selectedId === r.id ? "var(--accent-soft)" : "transparent",
                 borderBottom: `1px solid ${T.line}`,
+                transition: "background 0.12s ease",
               }}
             >
-              <td style={{ padding: "9px 12px", fontWeight: 600, color: T.ink }}>{r.name}</td>
-              <td style={{ padding: "9px 12px" }}><RiskPill band={r.riskBand} /></td>
-              <td style={{ padding: "9px 12px" }}><RiskPill band={r.probBand} /></td>
-              <td style={{ padding: "9px 12px", color: T.sub }}>{r.impactBand}</td>
-              <td style={{ padding: "9px 12px", textAlign: "right" }}>{r.threats}</td>
-              <td style={{ padding: "9px 12px", textAlign: "right" }}>{r.mitigations}</td>
+              <td style={{ padding: "11px 14px", fontWeight: 600, color: T.ink }}>{r.name}</td>
+              <td style={{ padding: "11px 14px" }}><RiskPill band={r.riskBand} small /></td>
+              <td style={{ padding: "11px 14px" }}><RiskPill band={r.probBand} small /></td>
+              <td style={{ padding: "11px 14px", color: T.sub }}>{r.impactBand}</td>
+              <td className="tnum" style={{ padding: "11px 14px", textAlign: "right", color: T.ink, fontWeight: 600 }}>{r.threats}</td>
+              <td className="tnum" style={{ padding: "11px 14px", textAlign: "right", color: T.ink, fontWeight: 600 }}>{r.mitigations}</td>
             </tr>
           ))}
         </tbody>
@@ -270,11 +307,15 @@ function RankList({ rows, metric }) {
   const label = (r) =>
     metric === "risk" ? r.risk : metric === "probability" ? r.probability : r.impact;
   return (
-    <ol style={{ margin: 0, paddingLeft: 20, fontSize: 13 }}>
-      {top.map((r) => (
-        <li key={r.id} style={{ marginBottom: 6, display: "list-item" }}>
-          <span style={{ fontWeight: 600, color: T.ink }}>{r.name}</span>
-          <span style={{ float: "right", color: T.teal, fontWeight: 700 }}>{label(r)}</span>
+    <ol style={{ margin: 0, padding: 0, listStyle: "none" }}>
+      {top.map((r, i) => (
+        <li key={r.id} style={{
+          display: "flex", alignItems: "center", gap: 10, padding: "7px 0",
+          borderBottom: i < top.length - 1 ? `1px solid ${T.line}` : "none",
+        }}>
+          <span className="tnum" style={{ fontFamily: T.display, fontSize: 12, fontWeight: 700, color: T.subSoft, width: 16 }}>{i + 1}</span>
+          <span style={{ fontWeight: 600, color: T.ink, fontSize: 13, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</span>
+          <span className="tnum" style={{ color: T.accentInk, fontWeight: 700, fontSize: 13.5 }}>{label(r)}</span>
         </li>
       ))}
     </ol>
@@ -316,7 +357,7 @@ function AddHazardForm({ onSave, onCancel }) {
 
   const label = { fontSize: 12, fontWeight: 600, color: T.sub, display: "block", marginBottom: 4 };
   const input = {
-    width: "100%", padding: "8px 10px", border: `1px solid ${T.line}`, borderRadius: 6,
+    width: "100%", padding: "8px 10px", border: `1px solid ${T.line}`, borderRadius: 9,
     fontSize: 13, boxSizing: "border-box", fontFamily: "inherit",
   };
 
@@ -332,25 +373,23 @@ function AddHazardForm({ onSave, onCancel }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: "#fff", borderRadius: 12, padding: 24, width: "100%",
+          background: "#fff", borderRadius: 16, padding: 24, width: "100%",
           maxWidth: 540, boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
         }}
       >
-        <h2 style={{ margin: "0 0 16px", fontSize: 18, color: T.teal }}>Add Hazard</h2>
+        <h2 style={{ margin: "0 0 4px", fontFamily: T.display, fontSize: 19, fontWeight: 800, color: T.ink, letterSpacing: -0.3 }}>Add hazard</h2>
+        <p style={{ margin: "0 0 18px", fontSize: 12.5, color: T.subSoft }}>Enter the assessment values. Risk score is calculated automatically.</p>
 
         <div style={{ marginBottom: 12 }}>
           <label style={label}>Hazard name *</label>
           <input style={input} value={f.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Flash Flooding" />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-          <div>
-            <label style={label}>Category</label>
-            <select style={input} value={f.category} onChange={(e) => set("category", e.target.value)}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <div />
+        <div style={{ marginBottom: 12 }}>
+          <label style={label}>Category</label>
+          <select style={input} value={f.category} onChange={(e) => set("category", e.target.value)}>
+            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
@@ -399,11 +438,11 @@ function AddHazardForm({ onSave, onCancel }) {
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button
             onClick={onCancel}
-            style={{ padding: "8px 16px", border: `1px solid ${T.line}`, borderRadius: 6, background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
+            style={{ padding: "8px 16px", border: `1px solid ${T.line}`, borderRadius: 9, background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
           >Cancel</button>
           <button
             onClick={submit}
-            style={{ padding: "8px 16px", border: "none", borderRadius: 6, background: T.teal, color: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
+            style={{ padding: "8px 16px", border: "none", borderRadius: 9, background: T.accent, color: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
           >Add Hazard</button>
         </div>
       </div>
@@ -569,7 +608,7 @@ export default function HVAReport() {
 
   if (loadError) {
     return (
-      <div style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", padding: 32, color: T.ink }}>
+      <div style={{ fontFamily: T.body, padding: 32, color: T.ink }}>
         <h3 style={{ color: "#c0392b", margin: "0 0 8px" }}>Couldn't load hazard data</h3>
         <p style={{ color: T.sub, margin: 0 }}>
           Tried to read <code>hazards.json</code> but got: {loadError}. Make sure the file
@@ -581,89 +620,96 @@ export default function HVAReport() {
 
   if (!data) {
     return (
-      <div style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", padding: 32, color: T.sub }}>
+      <div style={{ fontFamily: T.body, padding: 32, color: T.sub }}>
         Loading hazard data…
       </div>
     );
   }
 
+  const todayStr = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+
+  const actionBtn = (extra) => ({
+    border: `1px solid ${T.line}`, borderRadius: 8, padding: "7px 13px",
+    fontSize: 12.5, cursor: "pointer", fontWeight: 600, background: T.panel,
+    color: T.sub, fontFamily: T.body, boxShadow: T.shadowSm, ...extra,
+  });
+
   return (
     <div style={{
-      fontFamily: "'Segoe UI', system-ui, sans-serif", background: T.bg,
-      padding: 16, color: T.ink, minHeight: 600,
+      fontFamily: T.body, background: T.bg,
+      padding: "20px 24px", color: T.ink, minHeight: 600,
     }}>
-      {/* Header bar */}
+      {/* Title block — report identity */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        background: T.panel, border: `1px solid ${T.line}`, borderRadius: 10,
-        padding: "12px 16px", marginBottom: 12, flexWrap: "wrap", gap: 10,
+        gap: 16, marginBottom: 16, flexWrap: "wrap",
       }}>
-        <strong style={{ color: T.teal, fontSize: 16 }}>Hazard Vulnerability Analysis — Report</strong>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {tabs.map((t) => {
-            const active = t.isCat ? (view === "category" && activeCategory === t.id) : view === t.id;
-            return (
-              <button
-                key={t.id}
-                onClick={() => {
-                  if (t.isCat) { setView("category"); setActiveCategory(t.id); }
-                  else { setView("summary"); setActiveCategory(null); }
-                }}
-                style={{
-                  border: "none", borderRadius: 6, padding: "6px 12px", fontSize: 12,
-                  cursor: "pointer", fontWeight: 600,
-                  background: active ? T.tealDark : T.chip, color: "#fff",
-                  opacity: active ? 1 : 0.85,
-                }}
-              >{t.label}</button>
-            );
-          })}
-          <button
-            onClick={() => setShowAdd(true)}
-            style={{
-              border: "none", borderRadius: 6, padding: "6px 12px",
-              fontSize: 12, cursor: "pointer", fontWeight: 600, background: "#27ae60", color: "#fff",
-            }}
-          >+ Add Hazard</button>
-          <button
-            onClick={exportData}
-            style={{
-              border: `1px solid ${T.teal}`, borderRadius: 6, padding: "6px 12px",
-              fontSize: 12, cursor: "pointer", fontWeight: 600, background: "#fff", color: T.teal,
-            }}
-          >Export hazards.json</button>
-          <button
-            onClick={clearAdded}
-            title="Remove hazards you added in this browser"
-            style={{
-              border: `1px solid ${T.line}`, borderRadius: 6, padding: "6px 12px",
-              fontSize: 12, cursor: "pointer", fontWeight: 600, background: "#fff", color: T.sub,
-            }}
-          >Clear my additions</button>
-          <button
-            onClick={exportPdf}
-            disabled={exporting}
-            style={{
-              border: `1px solid ${T.teal}`, borderRadius: 6, padding: "6px 12px",
-              fontSize: 12, cursor: "pointer", fontWeight: 600, background: "#fff", color: T.teal,
-            }}
-          >{exporting ? "Exporting…" : "Export PDF"}</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* logo placeholder — the template calls for a company logo */}
+          <div style={{
+            width: 44, height: 44, borderRadius: 11, background: T.accent,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#fff", fontFamily: T.display, fontWeight: 800, fontSize: 18,
+            boxShadow: T.shadowMd, flexShrink: 0,
+          }}>HV</div>
+          <div>
+            <h1 style={{
+              margin: 0, fontFamily: T.display, fontSize: 21, fontWeight: 800,
+              color: T.ink, letterSpacing: -0.4, lineHeight: 1.1,
+            }}>Hazard Vulnerability Analysis</h1>
+            <div style={{ fontSize: 12.5, color: T.subSoft, marginTop: 2 }}>
+              Preparedness report · {todayStr}
+            </div>
+          </div>
         </div>
+        <div className="no-print" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button onClick={() => setShowAdd(true)} style={actionBtn({ background: T.accent, color: "#fff", border: `1px solid ${T.accent}` })}>+ Add hazard</button>
+          <button onClick={exportData} style={actionBtn()}>Export data</button>
+          <button onClick={exportPdf} disabled={exporting} style={actionBtn()}>{exporting ? "Exporting…" : "Export PDF"}</button>
+          <button onClick={clearAdded} title="Remove hazards you added in this browser" style={actionBtn({ color: T.subSoft })}>Reset</button>
+        </div>
+      </div>
+
+      {/* Segmented navigation */}
+      <div className="no-print" style={{
+        display: "inline-flex", gap: 3, padding: 4, marginBottom: 18,
+        background: T.bg2, borderRadius: 11, flexWrap: "wrap",
+      }}>
+        {tabs.map((t) => {
+          const active = t.isCat ? (view === "category" && activeCategory === t.id) : (view === t.id || (view === "details" && !t.isCat && t.id === "summary"));
+          return (
+            <button
+              key={t.id}
+              onClick={() => {
+                if (t.isCat) { setView("category"); setActiveCategory(t.id); }
+                else { setView("summary"); setActiveCategory(null); }
+              }}
+              style={{
+                border: "none", borderRadius: 8, padding: "7px 15px", fontSize: 12.5,
+                cursor: "pointer", fontWeight: 600, fontFamily: T.body,
+                background: active ? T.panel : "transparent",
+                color: active ? T.accentInk : T.sub,
+                boxShadow: active ? T.shadowSm : "none",
+                transition: "all 0.15s ease",
+              }}
+            >{t.label}</button>
+          );
+        })}
       </div>
 
       {showAdd && <AddHazardForm onSave={addHazard} onCancel={() => setShowAdd(false)} />}
 
-      <div ref={reportRef} style={{ display: "grid", gridTemplateColumns: "150px 1fr", gap: 12 }}>
+      <div ref={reportRef} style={{ display: "grid", gridTemplateColumns: "168px 1fr", gap: 16 }}>
         {/* Left stat rail */}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <StatBox label="Preparedness Index" value={totals.preparedness} />
+          <StatBox label="Preparedness Index" value={totals.preparedness} accent />
           <StatBox label="Total Hazards" value={totals.hazards} />
           <StatBox label="Total Threats" value={totals.threats} />
           <StatBox label="Total Mitigations" value={totals.mitigations} />
         </div>
 
         {/* Main column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {(view === "summary" || view === "category") && (
             <>
               {view === "category" && (
@@ -712,30 +758,31 @@ export default function HVAReport() {
               <button
                 onClick={() => setView("summary")}
                 style={{
-                  alignSelf: "flex-start", border: "none", background: "transparent",
-                  color: T.teal, cursor: "pointer", fontWeight: 600, fontSize: 13, padding: 0,
+                  alignSelf: "flex-start", border: `1px solid ${T.line}`, background: T.panel,
+                  color: T.sub, cursor: "pointer", fontWeight: 600, fontSize: 12.5,
+                  padding: "7px 14px", borderRadius: 8, boxShadow: T.shadowSm, fontFamily: T.body,
                 }}
               >← Back to summary</button>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <Panel title={`${selected.name} — Risk Analysis`}>
-                  <div style={{ display: "flex", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
                     <RiskPill band={selected.riskBand} />
-                    <span style={{ fontSize: 12, color: T.sub }}>Category: <strong>{selected.category}</strong></span>
+                    <span style={{ fontSize: 12, color: T.sub }}>Category: <strong style={{ color: T.ink }}>{selected.category}</strong></span>
                   </div>
-                  <div style={{ display: "flex", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
-                    <div><div style={{ fontSize: 11, color: T.sub }}>Probability</div><div style={{ fontWeight: 700, fontSize: 20 }}>{selected.probability}</div></div>
-                    <div><div style={{ fontSize: 11, color: T.sub }}>Impact</div><div style={{ fontWeight: 700, fontSize: 20 }}>{selected.impact}</div></div>
-                    <div><div style={{ fontSize: 11, color: T.sub }}>Current Risk</div><div style={{ fontWeight: 700, fontSize: 20, color: T.teal }}>{selected.risk}</div></div>
-                    <div><div style={{ fontSize: 11, color: T.sub }}>Target Risk</div><div style={{ fontWeight: 700, fontSize: 20, color: "#27ae60" }}>{selected.targetRisk}</div></div>
+                  <div style={{ display: "flex", gap: 20, marginBottom: 14, flexWrap: "wrap" }}>
+                    <div><div style={{ fontSize: 10.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>Probability</div><div className="tnum" style={{ fontFamily: T.display, fontWeight: 800, fontSize: 22, color: T.ink }}>{selected.probability}</div></div>
+                    <div><div style={{ fontSize: 10.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>Impact</div><div className="tnum" style={{ fontFamily: T.display, fontWeight: 800, fontSize: 22, color: T.ink }}>{selected.impact}</div></div>
+                    <div><div style={{ fontSize: 10.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>Current risk</div><div className="tnum" style={{ fontFamily: T.display, fontWeight: 800, fontSize: 22, color: T.accent }}>{selected.risk}</div></div>
+                    <div><div style={{ fontSize: 10.5, color: T.subSoft, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>Target risk</div><div className="tnum" style={{ fontFamily: T.display, fontWeight: 800, fontSize: 22, color: "var(--risk-low)" }}>{selected.targetRisk}</div></div>
                   </div>
                   {/* current vs target benchmark bar */}
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{ height: 10, background: T.line, borderRadius: 5, position: "relative" }}>
-                      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${selected.risk}%`, background: T.teal, borderRadius: 5 }} />
-                      <div title="Target" style={{ position: "absolute", left: `${selected.targetRisk}%`, top: -3, bottom: -3, width: 2, background: "#27ae60" }} />
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ height: 8, background: T.bg2, borderRadius: 999, position: "relative" }}>
+                      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${selected.risk}%`, background: T.accent, borderRadius: 999 }} />
+                      <div title="Target" style={{ position: "absolute", left: `${selected.targetRisk}%`, top: -4, bottom: -4, width: 3, background: "var(--risk-low)", borderRadius: 2 }} />
                     </div>
-                    <div style={{ fontSize: 10, color: T.sub, marginTop: 4 }}>Current risk vs target benchmark (green marker)</div>
+                    <div style={{ fontSize: 10.5, color: T.subSoft, marginTop: 6 }}>Current risk vs target benchmark (green marker)</div>
                   </div>
                   <p style={{ fontSize: 12, color: T.ink, lineHeight: 1.5, margin: "0 0 6px" }}><strong>Definition:</strong> {selected.definition}</p>
                   <p style={{ fontSize: 12, color: T.sub, lineHeight: 1.5, margin: 0 }}><strong>Context:</strong> {selected.context}</p>
