@@ -498,6 +498,8 @@ export default function HVAReport() {
     saveAdded([]);
     window.location.reload();
   }
+
+  const rows = useMemo(() => {
     if (!data) return [];
     if (view === "category" && activeCategory) {
       return data.filter((r) => r.category === activeCategory);
